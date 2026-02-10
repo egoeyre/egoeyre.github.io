@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qunniao Tech | Future of Vehicle Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        glass: 'rgba(30, 41, 59, 0.7)'
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+        .lang-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(30,41,59,0.5);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .lang-switch span {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            transition: all 0.25s ease;
+            color: rgba(255,255,255,0.5);
+            user-select: none;
+        }
+        .lang-switch span.active {
+            background: rgba(59,130,246,0.6);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="relative">
+        
+        <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-float"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-float" style="animation-delay: 2s"></div>
+        </div>
+
+        <nav class="fixed w-full z-50 transition-all duration-300" :class="scrolled ? 'glass-panel shadow-lg' : 'bg-transparent'">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center gap-2 cursor-pointer" @click="scrollTo('hero')">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">Q</div>
+                        <span class="font-bold text-xl tracking-wider text-white">QUNNIAO<span class="text-blue-500">TECH</span></span>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center gap-6">
+                        <div class="flex items-baseline space-x-8">
+                            <a v-for="item in navItems" :key="item.en" @click.prevent="scrollTo(item.target)" href="#" class="hover:text-blue-400 transition-colors px-3 py-2 rounded-md text-sm font-medium tracking-wide">
+                                {{ lang === 'en' ? item.en : item.zh }}
+                            </a>
+                        </div>
+                        <!-- Language Switch -->
+                        <div class="lang-switch" @click="toggleLang">
+                            <span :class="{ active: lang === 'en' }">EN</span>
+                            <span :class="{ active: lang === 'zh' }">中</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 md:hidden">
+                        <div class="lang-switch" @click="toggleLang">
+                            <span :class="{ active: lang === 'en' }">EN</span>
+                            <span :class="{ active: lang === 'zh' }">中</span>
+                        </div>
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                            <i class="fa-solid" :class="mobileMenuOpen ? 'fa-xmark' : 'fa-bars'"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <transition 
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="opacity-0 -translate-y-2"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 -translate-y-2">
+                <div v-if="mobileMenuOpen" class="md:hidden glass-panel border-t-0">
+                    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                        <a v-for="item in navItems" :key="item.en" @click.prevent="scrollTo(item.target); mobileMenuOpen = false" href="#" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+                            {{ lang === 'en' ? item.en : item.zh }}
+                        </a>
+                    </div>
+                </div>
+            </transition>
+        </nav>
+
+        <!-- Hero -->
+        <section id="hero" class="min-h-screen flex items-center justify-center pt-20 px-4">
+            <div class="text-center max-w-5xl mx-auto space-y-8 animate-fade-in-up">
+                <div class="inline-block px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-sm font-semibold tracking-wide mb-4">
+                    🚀 {{ t('hero.badge') }}
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-tight">
+                    {{ t('hero.title1') }} <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">{{ t('hero.title2') }}</span>
+                </h1>
+                <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-400">
+                    {{ t('hero.desc') }}
+                </p>
+                <div class="mt-10 flex justify-center gap-4">
+                    <button @click="scrollTo('contact')" class="px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg transition-all transform hover:scale-105 shadow-lg shadow-blue-600/30">
+                        {{ t('hero.cta1') }}
+                    </button>
+                    <button @click="scrollTo('solutions')" class="px-8 py-4 rounded-full glass-panel hover:bg-white/10 text-white font-bold text-lg transition-all border border-white/20">
+                        {{ t('hero.cta2') }}
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solutions -->
+        <section id="solutions" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-blue-500 font-semibold tracking-wide uppercase">{{ t('solutions.subtitle') }}</h2>
+                    <p class="mt-2 text-3xl font-extrabold text-white sm:text-4xl">{{ t('solutions.title') }}</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div v-for="(sol, index) in solutions" :key="index" class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all duration-300 group cursor-default relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                        <div class="w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
+                            <i :class="sol.icon"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4">{{ lang === 'en' ? sol.title_en : sol.title_zh }}</h3>
+                        <p class="text-gray-400 leading-relaxed">{{ lang === 'en' ? sol.desc_en : sol.desc_zh }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section class="py-12 border-y border-white/5 bg-black/20">
+            <div class="max-w-7xl mx-auto px-4 overflow-hidden">
+                <p class="text-center text-gray-500 text-sm mb-8 uppercase tracking-widest">{{ t('tech.title') }}</p>
+                <div class="flex justify-center flex-wrap gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                    <div v-for="tech in techStack" :key="tech.name" class="flex items-center gap-2">
+                        <i :class="tech.icon" class="text-2xl text-white"></i>
+                        <span class="font-bold text-lg text-gray-300">{{ tech.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="glass-panel rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2">
+                        <h2 class="text-3xl font-extrabold text-white mb-6">{{ t('about.title') }}</h2>
+                        <div class="space-y-4 text-gray-300 text-lg leading-relaxed">
+                            <p>{{ t('about.p1') }}</p>
+                            <p v-html="t('about.p2')"></p>
+                            <p>{{ t('about.p3') }}</p>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 w-full">
+                        <div class="aspect-video rounded-xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center relative overflow-hidden group">
+                            <div class="absolute inset-0 p-6 font-mono text-xs text-green-400 opacity-60">
+                                > connecting to OBD-II interface...<br/>
+                                > protocol: ISO 15765-4 CAN (11 bit ID, 500 kbaud)<br/>
+                                > engine_rpm: 2450<br/>
+                                > vehicle_speed: 65 km/h<br/>
+                                > coolant_temp: 90°C<br/>
+                                > status: connected<br/>
+                                <span class="animate-pulse">_</span>
+                            </div>
+                            <div class="z-10 text-center">
+                                <i class="fa-solid fa-code text-6xl text-white/20 group-hover:text-blue-500/50 transition-colors"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="py-24 relative">
+            <div class="max-w-3xl mx-auto px-4 text-center">
+                <h2 class="text-3xl font-extrabold text-white mb-8">{{ t('contact.title') }}</h2>
+                <div class="glass-panel rounded-2xl p-10 transform hover:scale-105 transition-transform duration-300">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-600/50">
+                            <i class="fa-regular fa-envelope"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">{{ t('contact.subtitle') }}</h3>
+                        <p class="text-gray-400">{{ t('contact.desc') }}</p>
+                        <a href="mailto:info@qunniao.com" class="text-2xl font-bold text-blue-400 hover:text-blue-300 transition-colors mt-2">
+                            info@qunniao.com
+                        </a>
+                        <p class="text-sm text-gray-500 mt-4">{{ t('contact.location') }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-white/10 bg-black py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-center md:text-left">
+                    <span class="font-bold text-xl text-white tracking-wider">QUNNIAO<span class="text-blue-500">TECH</span></span>
+                    <p class="text-gray-500 text-sm mt-2">{{ t('footer.company') }}</p>
+                </div>
+                <div class="text-gray-500 text-sm text-center md:text-right">
+                    <p>&copy; 2026 {{ t('footer.company') }} {{ t('footer.rights') }}</p>
+                    <p class="mt-1">{{ t('footer.tagline') }}</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import { createApp, ref, onMounted, onUnmounted } from 'vue'
+
+        const i18n = {
+            en: {
+                'hero.badge': 'Revolutionizing Vehicle Inspection',
+                'hero.title1': 'Drive Data into',
+                'hero.title2': 'Actionable Intelligence',
+                'hero.desc': "Tai'an Qunniao Network Technology Co., Ltd. builds the bridge between OBD hardware and modern cloud infrastructure.",
+                'hero.cta1': 'Start Collaboration',
+                'hero.cta2': 'Explore Tech',
+                'solutions.subtitle': 'Core Competencies',
+                'solutions.title': 'Engineering the Future of Auto',
+                'tech.title': 'Powered By Modern Tech Stack',
+                'about.title': 'About Qunniao',
+                'about.p1': "Founded in Tai'an, we are a team of passionate engineers dedicated to the automotive aftermarket.",
+                'about.p2': 'Unlike traditional software shops, we understand cars. From the physical layer of <strong>OBD protocols</strong> to the cloud layer of <strong>inspection management</strong>, we build full-stack solutions.',
+                'about.p3': 'We are currently expanding into consumer-facing platforms, aiming to create transparent marketplaces for used vehicles.',
+                'contact.title': 'Ready to Transform Your Business?',
+                'contact.subtitle': 'Contact Our Team',
+                'contact.desc': 'For inquiries regarding partnerships, development, or inspection systems.',
+                'contact.location': "Based in Tai'an City, Shandong, China",
+                'footer.company': "Tai'an Qunniao Network Technology Co., Ltd.",
+                'footer.rights': 'All rights reserved.',
+                'footer.tagline': 'Designed for Performance & Reliability.',
+            },
+            zh: {
+                'hero.badge': '革新车辆检测行业',
+                'hero.title1': '将数据转化为',
+                'hero.title2': '可执行的智能决策',
+                'hero.desc': '泰安群鸟网络科技有限公司——连接 OBD 硬件与现代云基础设施的桥梁。',
+                'hero.cta1': '开始合作',
+                'hero.cta2': '探索技术',
+                'solutions.subtitle': '核心能力',
+                'solutions.title': '驱动汽车行业的未来',
+                'tech.title': '基于现代技术栈构建',
+                'about.title': '关于群鸟科技',
+                'about.p1': '群鸟科技成立于泰安，是一支专注于汽车后市场的工程师团队。',
+                'about.p2': '不同于传统软件公司，我们真正理解汽车。从 <strong>OBD 协议</strong>的物理层到<strong>检测管理</strong>的云端，我们打造全栈解决方案。',
+                'about.p3': '我们正在拓展面向消费者的平台，致力于创建透明的二手车交易市场。',
+                'contact.title': '准备好转型您的业务了吗？',
+                'contact.subtitle': '联系我们',
+                'contact.desc': '如有合作、开发或检测系统相关需求，欢迎联系。',
+                'contact.location': '中国山东省泰安市',
+                'footer.company': '泰安群鸟网络科技有限公司',
+                'footer.rights': '版权所有。',
+                'footer.tagline': '专注性能与可靠性。',
+            }
+        }
+
+        createApp({
+            setup() {
+                const mobileMenuOpen = ref(false)
+                const scrolled = ref(false)
+                const lang = ref('en')
+
+                const toggleLang = () => {
+                    lang.value = lang.value === 'en' ? 'zh' : 'en'
+                    document.documentElement.lang = lang.value === 'zh' ? 'zh-CN' : 'en'
+                }
+
+                const t = (key) => {
+                    return i18n[lang.value][key] || key
+                }
+
+                const navItems = [
+                    { en: 'About', zh: '关于我们', target: 'about' },
+                    { en: 'Solutions', zh: '解决方案', target: 'solutions' },
+                    { en: 'Contact', zh: '联系我们', target: 'contact' }
+                ]
+
+                const solutions = [
+                    { 
+                        title_en: 'OBD Diagnostics',
+                        title_zh: 'OBD 诊断',
+                        desc_en: 'Real-time vehicle health monitoring using custom Rust/Flutter implementations for low-latency BLE communication.',
+                        desc_zh: '使用自研 Rust/Flutter 实现低延迟 BLE 通信，实时监控车辆健康状态。',
+                        icon: 'fa-solid fa-car-battery'
+                    },
+                    { 
+                        title_en: 'Mobile Ecosystem',
+                        title_zh: '移动生态',
+                        desc_en: 'Native and cross-platform apps (iOS/Android) built with Swift and React Native, focusing on user experience.',
+                        desc_zh: '使用 Swift 和 React Native 构建原生及跨平台应用 (iOS/Android)，专注用户体验。',
+                        icon: 'fa-brands fa-apple'
+                    },
+                    { 
+                        title_en: 'Inspection Cloud',
+                        title_zh: '检测云平台',
+                        desc_en: 'Comprehensive SaaS platforms for vehicle inspection stations to manage workflows and customer retention.',
+                        desc_zh: '面向车辆检测站的综合 SaaS 平台，管理工作流程和客户留存。',
+                        icon: 'fa-solid fa-cloud-arrow-up'
+                    }
+                ]
+
+                const techStack = [
+                    { name: 'Rust', icon: 'fa-brands fa-rust' },
+                    { name: 'Flutter', icon: 'fa-brands fa-google' },
+                    { name: 'Swift', icon: 'fa-brands fa-swift' },
+                    { name: 'React Native', icon: 'fa-brands fa-react' }
+                ]
+
+                const scrollTo = (id) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                        mobileMenuOpen.value = false;
+                    }
+                }
+
+                const handleScroll = () => {
+                    scrolled.value = window.scrollY > 50
+                }
+
+                onMounted(() => {
+                    window.addEventListener('scroll', handleScroll)
+                })
+
+                onUnmounted(() => {
+                    window.removeEventListener('scroll', handleScroll)
+                })
+
+                return {
+                    mobileMenuOpen,
+                    scrolled,
+                    lang,
+                    toggleLang,
+                    t,
+                    navItems,
+                    solutions,
+                    techStack,
+                    scrollTo
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
